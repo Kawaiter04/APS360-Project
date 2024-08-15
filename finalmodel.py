@@ -10,7 +10,6 @@ import math
 import os
 from torch.utils.data import DataLoader, random_split
 from torch.utils.data.sampler import SubsetRandomSampler
-#import pandas as pd
 import torchvision
 from torchvision import datasets, models, transforms
 import shutil
@@ -38,20 +37,6 @@ class CNNClassifier(nn.Module):
         x = self.dropout(F.relu(self.fc1(x)))
         x = self.fc2(x)
         return x
-    '''
-    def forward(self, x):
-        x = self.pool(F.relu(self.bn1(self.conv1(x))))
-        x = self.pool(F.relu(self.bn2(self.conv2(x))))
-        x = self.pool(F.relu(self.bn3(self.conv3(x))))
-        print("Shape before view: ", x.shape)
-        x = x.view(x.size(0), -1)  # Flatten the tensor while preserving the batch size
-        print("Shape after view: ", x.shape)
-        x = self.dropout(F.relu(self.fc1(x)))
-        x = self.fc2(x)
-        return x
-    '''
-# you can tell your model it is in training mode to use drop out. Make it better but decrease accuracy
-# In validation u dont do drop out. It should do very well.
 
 if __name__ == '__main__':
     root_str = 'combined_data\\'
@@ -72,10 +57,6 @@ if __name__ == '__main__':
     val3_loader = torch.utils.data.DataLoader(dataset3_val, batch_size=64, num_workers=0, shuffle=True)
     train3_loader = torch.utils.data.DataLoader(dataset3_train, batch_size=64, num_workers=0, shuffle=True)
     test3_loader = torch.utils.data.DataLoader(dataset3_test, batch_size=64, num_workers=0, shuffle=True)
-
-    #dataset3_overfit = torchvision.datasets.ImageFolder(root=root_str + '\overfit', transform=transform)
-    #overfit3_loader = torch.utils.data.DataLoader(dataset3_overfit, batch_size=64, num_workers=2, shuffle=True)
-    #print(len(dataset3_overfit))
 
     def get_model_name(name, batch_size, learning_rate, epoch):
         """ Generate a name for the model consisting of all the hyperparameter values
@@ -218,26 +199,5 @@ if __name__ == '__main__':
         print("Final Training Accuracy: {}".format(train_acc[-1]))
         print("Final Validation Accuracy: {}".format(val_acc[-1]))
 
-    import os
-    from PIL import Image
-    '''
-    def check_images(root_dir):
-        for root, _, files in os.walk(root_dir):
-            for file in files:
-                if file.endswith(('.jpg', '.jpeg', '.png')):
-                    file_path = os.path.join(root, file)
-                    try:
-                        img = Image.open(file_path)
-                        img.verify()  # Verify the image file is not corrupted
-                    except (IOError, SyntaxError) as e:
-                        print(f"Corrupt file: {file_path}")
-
-    root_dir = 'Dataset_3_classes\\'
-    check_images(root_dir)
-    print("done")
-    '''
-
     test_model = CNNClassifier()
     train(test_model, data1 = dataset3_train, batch_size=15, num_epochs=100, learning_rate=0.00005)
-        #note: both the training and validation datasets are the same since we are only testing over the overfit dataset
-        #thus both the "training" and "validation" datasets are actually just the overfit dataset
