@@ -11,11 +11,8 @@ import os
 from torch.utils.data import DataLoader, random_split
 from torch.utils.data.sampler import SubsetRandomSampler
 import torchvision.models
-
-# import pandas as pd
 import torchvision
 import shutil
-
 import warnings
 
 warnings.filterwarnings("ignore", category=UserWarning)
