@@ -37,50 +37,6 @@ class CNNClassifier(nn.Module):
         x = self.resnet(x)
         return x
 
-
-"""class CNNClassifier(nn.Module):
-    def __init__(self):
-        self.name = "CNN"
-        super(CNNClassifier, self).__init__()
-        self.conv1 = nn.Conv2d(3, 5, 5)
-        self.bn1 = nn.BatchNorm2d(5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(5, 10, 10)
-        self.bn2 = nn.BatchNorm2d(10)
-        self.conv3 = nn.Conv2d(10, 15, 15)
-        self.bn3 = nn.BatchNorm2d(15)
-        self.dropout = nn.Dropout(0.4)
-        self.fc1 = nn.Linear(4860, 32)
-        self.fc2 = nn.Linear(32, 4) """
-
-""" def forward(self, x):
-        x = self.pool(F.relu(self.bn1(self.conv1(x))))
-        x = self.pool(F.relu(self.bn2(self.conv2(x))))
-        x = self.pool(F.relu(self.bn3(self.conv3(x))))
-        print("Shape before view: ", x.shape)
-        x = x.view(x.size(0), -1)  # Flatten the tensor while preserving the batch size
-        print("Shape after view: ", x.shape)
-        x = self.dropout(F.relu(self.fc1(x)))
-        x = self.fc2(x)
-        return x
-    """
-
-""" def forward(self, x):
-        x = self.pool(F.relu(self.bn1(self.conv1(x))))
-        x = self.pool(F.relu(self.bn2(self.conv2(x))))
-        x = self.pool(F.relu(self.bn3(self.conv3(x))))
-        x = x.view(-1, 4860)
-        x = self.dropout(F.relu(self.fc1(x)))
-        x = self.fc2(x)
-        return x """
-
-
-# resnet18 = torchvision.models.resnet.resnet18(pretrained=False)
-
-
-# you can tell your model it is in training mode to use drop out. Make it better but decrease accuracy
-# In validation u dont do drop out. It should do very well.
-
 if __name__ == "__main__":
     root_str = 'combined_data\\'
 
@@ -96,9 +52,6 @@ if __name__ == "__main__":
     train3_loader = torch.utils.data.DataLoader(dataset3_train, batch_size=64, num_workers=0, shuffle=True)
     test3_loader = torch.utils.data.DataLoader(dataset3_test, batch_size=64, num_workers=0, shuffle=True)
 
-    # dataset3_overfit = torchvision.datasets.ImageFolder(root=root_str + '\overfit', transform=transform)
-    # overfit3_loader = torch.utils.data.DataLoader(dataset3_overfit, batch_size=64, num_workers=2, shuffle=True)
-    # print(len(dataset3_overfit))
 
     def get_model_name(name, batch_size, learning_rate, epoch):
         """Generate a name for the model consisting of all the hyperparameter values
@@ -259,23 +212,6 @@ if __name__ == "__main__":
     import os
     from PIL import Image
 
-    """
-    def check_images(root_dir):
-        for root, _, files in os.walk(root_dir):
-            for file in files:
-                if file.endswith(('.jpg', '.jpeg', '.png')):
-                    file_path = os.path.join(root, file)
-                    try:
-                        img = Image.open(file_path)
-                        img.verify()  # Verify the image file is not corrupted
-                    except (IOError, SyntaxError) as e:
-                        print(f"Corrupt file: {file_path}")
-
-    root_dir = 'Dataset_3_classes\\'
-    check_images(root_dir)
-    print("done")
-    """
-
     test_model = CNNClassifier(num_classes=4)
     train(
         test_model,
@@ -284,14 +220,3 @@ if __name__ == "__main__":
         num_epochs=250,
         learning_rate=0.000001,
     )
-
-    """train(
-        resnet18,
-        data1=dataset3_train,
-        batch_size=25,
-        num_epochs=50,
-        learning_rate=0.00007,
-    )"""
-
-    # note: both the training and validation datasets are the same since we are only testing over the overfit dataset
-    # thus both the "training" and "validation" datasetrs are actually just the overfit dataset
