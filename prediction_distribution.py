@@ -49,7 +49,7 @@ def get_accuracy(model, data_loader, device):
             total += imgs.shape[0]
     return correct / total
 
-# from online source and was modified to adhere to our model and dataset
+# from online source and was modified to adhere to our model and dataset to determine predictions
 if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
