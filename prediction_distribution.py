@@ -10,7 +10,6 @@ import os
 import torchvision.models
 from PIL import Image
 
-# Define the CNN model
 class CNNClassifier(nn.Module):
     def __init__(self):
         self.name = "CNN"
@@ -35,7 +34,6 @@ class CNNClassifier(nn.Module):
         x = self.fc2(x)
         return x
 
-# Define the function to calculate accuracy
 def get_accuracy(model, data_loader, device):
     correct = 0
     total = 0
@@ -51,87 +49,73 @@ def get_accuracy(model, data_loader, device):
             total += imgs.shape[0]
     return correct / total
 
-# Main function
+# from online source and was modified to adhere to our model and dataset
 if __name__ == "__main__":
-    # Set device
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Load the model
     model_path = "model_CNN_bs15_lr1e-05_epoch144"
     model = CNNClassifier().to(device)  # Move model to the correct device
     model.load_state_dict(torch.load(model_path, map_location=device))
 
-    # Define the preprocessing pipeline
     preprocess = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
     ])
 
-    # Load the dataset
     large_dataset = torchvision.datasets.ImageFolder(root="Large_Dataset", transform=preprocess)
     loader = torch.utils.data.DataLoader(large_dataset, batch_size=32, shuffle=True)
 
-    # Calculate and print the test accuracy
     accuracy = get_accuracy(model, loader, device)
     print(f"Test accuracy: {accuracy*100:.2f} %")
 
-    folder_path = "Large_Dataset"  # Replace with your folder path
-
-    # List to store images, predictions, and ground truths
+    folder_path = "Large_Dataset"  
+    
     images = []
     predictions = []
     ground_truths = []
 
-    # Loop through all the images in the folder structure
-    for root, _, files in os.walk(folder_path):  # Walk through subfolders
+
+    for root, _, files in os.walk(folder_path):  
         for image_name in files:
             if image_name.endswith((".jpg", ".jpeg", ".png")):
-                # Load and preprocess the image
                 image_path = os.path.join(root, image_name)
                 image = Image.open(image_path).convert("RGB")
-                image_tensor = preprocess(image).unsqueeze(0).to(device)  # Move tensor to device
+                image_tensor = preprocess(image).unsqueeze(0).to(device)  
 
                 # Perform inference
                 with torch.no_grad():
                     out = model(image_tensor)
 
-                # Convert the output to probabilities
                 prob = F.softmax(out, dim=1)
 
-                # Determine the predicted class
                 predicted_class = torch.argmax(prob, dim=1).item()
 
-                # Define the class labels
                 class_labels = ["glioma", "meningioma", "notumor", "pituitary"]
                 predicted_label = class_labels[predicted_class]
 
-                # Extract ground truth label from the folder name
-                ground_truth_label = os.path.basename(root)  # Folder name as ground truth
+                ground_truth_label = os.path.basename(root) 
 
-                # Append image, prediction, and ground truth to the lists
                 images.append(image)
                 predictions.append(predicted_label)
                 ground_truths.append(ground_truth_label)
 
-    # Plot the images with their predictions and ground truths
     n_images = len(images)
-    n_cols = 7  # Number of columns in the grid (set to 4 here)
-    n_rows = max((n_images + n_cols - 1) // n_cols, 1)  # Calculate the number of rows, ensuring it's at least 1
+    n_cols = 7  
+    n_rows = max((n_images + n_cols - 1) // n_cols, 1)
 
     fig, axes = plt.subplots(
-        n_rows, n_cols, figsize=(15, 3 * n_rows)  # Adjust figure size to make images smaller
+        n_rows, n_cols, figsize=(15, 3 * n_rows) 
     )
 
-    # Loop through each subplot and display the image, prediction, and ground truth
     for i, ax in enumerate(axes.flat):
         if i < n_images:
             ax.imshow(images[i])
             ax.set_title(f"Predicted: {predictions[i]}\nGround Truth: {ground_truths[i]}")
-            ax.axis("off")  # Hide axes
-            # Set the aspect ratio and make sure images fit well
+            ax.axis("off") 
             ax.set_aspect('auto', adjustable='box')
         else:
-            ax.axis("off")  # Hide any extra empty subplots
+            ax.axis("off"
 
     plt.tight_layout()
     plt.show()
